@@ -36,6 +36,8 @@ class TicTacToe(tk.Tk):
         # Create widgets
         self.create_widgets()
 
+        
+
     def set_symbol(self, symbol):
         # Set player symbol
         self.player = symbol
@@ -109,17 +111,19 @@ class TicTacToe(tk.Tk):
     def create_widgets(self):
         # Create widgets
         label = tk.Label(self, text="Tic Tac Toe\n\nby Michael Jonathan Halim | 13521124", bg="#222222", fg="#FFFFFF")
-        label.grid(row=0, column=0, columnspan=3, pady=20)
+        label.grid(row=0, column=5, columnspan=3, pady=20, sticky = 'n')
 
+        cont = tk.Label(self, text='', bg="#222222", fg="#FFFFFF")
+        cont.grid(row=0, column=10, sticky = 'n')
         # Create button to play
         self.play_button = tk.Button(self, text="Play", command=self.choose_symbol, bg="#333333", fg="#FFFFFF")
-        self.play_button.grid(row=1, column=0, columnspan=3, pady=10)
+        self.play_button.grid(row=1, column=5, columnspan=3, pady=10)
 
         # Configure grid to center the widgets
-        self.grid_rowconfigure(0, weight=1)
-        self.grid_rowconfigure(2, weight=1)
-        self.grid_columnconfigure(0, weight=1)
-        self.grid_columnconfigure(2, weight=1)
+        self.grid_rowconfigure(0, weight=2)
+        self.grid_rowconfigure(9, weight=2)
+        self.grid_columnconfigure(0, weight=2)
+        self.grid_columnconfigure(9, weight=2)
 
     def create_board(self):
         # Create board display
@@ -127,12 +131,12 @@ class TicTacToe(tk.Tk):
         self.buttons = []
 
         # Create buttons
-        for row in range(3):
+        for row in range(8):
             button_row = []
-            for col in range(3):
-                button = tk.Button(self, text="", width=10, height=5,
+            for col in range(8):
+                button = tk.Button(self, text="", width=6, height=2,
                                    command=lambda r=row, c=col: self.button_click(r, c), bg="#333333", fg="#FFFFFF")
-                button.grid(row=row+2, column=col, padx=5, pady=5)
+                button.grid(row=row+2, column=col+1, padx=0, pady=0)
                 button_row.append(button)
             self.buttons.append(button_row)
 
