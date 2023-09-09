@@ -121,7 +121,7 @@ class TicTacToe(tk.Tk):
 
         # Configure grid to center the widgets
         self.grid_rowconfigure(0, weight=2)
-        self.grid_rowconfigure(9, weight=2)
+        self.grid_rowconfigure(10, weight=2)
         self.grid_columnconfigure(0, weight=2)
         self.grid_columnconfigure(9, weight=2)
 
