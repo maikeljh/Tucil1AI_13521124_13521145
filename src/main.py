@@ -119,6 +119,26 @@ class TicTacToe(tk.Tk):
         self.play_button = tk.Button(self, text="Play", command=self.choose_symbol, bg="#333333", fg="#FFFFFF")
         self.play_button.grid(row=1, column=5, columnspan=3, pady=10)
 
+       # Reset every gaps between rows & columns within the grid in the future
+        self.grid_rowconfigure(1, weight = 0)
+        self.grid_rowconfigure(2, weight = 0)
+        self.grid_rowconfigure(3, weight = 0)
+        self.grid_rowconfigure(4, weight = 0)
+        self.grid_rowconfigure(5, weight = 0)
+        self.grid_rowconfigure(6, weight = 0)
+        self.grid_rowconfigure(7, weight = 0)
+        self.grid_rowconfigure(8, weight = 0)
+        self.grid_rowconfigure(9, weight = 0)
+        
+        self.grid_columnconfigure(1, weight = 0)
+        self.grid_columnconfigure(2, weight = 0)
+        self.grid_columnconfigure(3, weight = 0)
+        self.grid_columnconfigure(4, weight = 0)
+        self.grid_columnconfigure(5, weight = 0)
+        self.grid_columnconfigure(6, weight = 0)
+        self.grid_columnconfigure(7, weight = 0)
+        self.grid_columnconfigure(8, weight = 0)
+        
         # Configure grid to center the widgets
         self.grid_rowconfigure(0, weight=2)
         self.grid_rowconfigure(10, weight=2)
@@ -149,6 +169,9 @@ class TicTacToe(tk.Tk):
             # Assign box to player
             button["text"] = self.player
             self.board[row][col] = self.player
+            
+            # Assign 4 adjacent tiles
+            self.adjacent(row, col)
 
             # Check if player wins or not
             if self.check_winner():
@@ -321,6 +344,46 @@ class TicTacToe(tk.Tk):
         elif self.check_draw():
             messagebox.showinfo("Game Over", "It's a draw!")
             self.reset_game()
+### Algo gw
+    def adjacent(self, row, col):
+        # Checking if adjacent tiles are out of the map
+        def Border_check(row, col):
+            if row > 9 | row < 2 | col > 8 | col < 1:
+                return True
+            else:
+                return False
+        # Checking 4 adjacent tiles
+        #  Under
+        if Border_check(row-1, col):
+            button = self.button[row-1][col]
+            if button["text"] == self.bot:
+                # Replace if tile was owned by the bot with the player
+                button["text"] = self.player
+                self.board[row-1][col] = self.player
+                
+        # Above
+        if Border_check(row+1, col):
+            button = self.button[row+1][col]
+            if button["text"] == self.bot:
+                # Replace if tile was owned by the bot with the player
+                button["text"] = self.player
+                self.board[row+1][col] = self.player
+        
+        # Left
+        if Border_check(row, col-1):
+            button = self.button[row][col-1]
+            if button["text"] == self.bot:
+                # Replace if tile was owned by the bot with the player
+                button["text"] = self.player
+                self.board[row][col-1] = self.player
+                
+        # Right
+        if Border_check(row, col+1):
+            button = self.button[row][col+1]
+            if button["text"] == self.bot:
+                # Replace if tile was owned by the bot with the player
+                button["text"] = self.player
+                self.board[row][col+1] = self.player
 
     def reset_game(self):
         # Reset board
