@@ -1,25 +1,27 @@
 # Michael Jonathan Halim 13521124
+# Kenneth Dave Bahana 13521145
 import tkinter as tk
 from tkinter import messagebox
 
-# Tic Tac Toe Application
-class TicTacToe(tk.Tk):
+# Tucil 1 AI Application
+class XOGame(tk.Tk):
     def __init__(self):
         # Constructor
         super().__init__()
 
         # Set application configuration
-        self.title("Tic Tac Toe")
-        self.geometry("450x500")
+        self.title("XOGame")
+        self.geometry("800x600")
         self.configure(bg="#222222")
+        self.resizable(False, False)
 
         # Get screen dimensions
         screen_width = self.winfo_screenwidth()
         screen_height = self.winfo_screenheight()
 
         # Calculate the position for the center of the screen
-        window_width = 450
-        window_height = 500
+        window_width = 800
+        window_height = 600
         x = (screen_width - window_width) // 2
         y = (screen_height - window_height) // 2
 
@@ -35,8 +37,6 @@ class TicTacToe(tk.Tk):
 
         # Create widgets
         self.create_widgets()
-
-        
 
     def set_symbol(self, symbol):
         # Set player symbol
@@ -92,6 +92,9 @@ class TicTacToe(tk.Tk):
             # Create board
             self.create_board()
 
+            # Create scoreboard
+            self.create_score_board()
+
             # Set symbol
             self.set_symbol(symbol)
 
@@ -110,55 +113,55 @@ class TicTacToe(tk.Tk):
 
     def create_widgets(self):
         # Create widgets
-        label = tk.Label(self, text="Tic Tac Toe\n\nby Michael Jonathan Halim | 13521124", bg="#222222", fg="#FFFFFF")
-        label.grid(row=0, column=5, columnspan=3, pady=20, sticky = 'n')
+        label = tk.Label(self, text="XOGame\n\nby Michael Jonathan Halim | 13521124\n   Kenneth Dave Bahana | 13521145", bg="#222222", fg="#FFFFFF")
+        label.grid(row=0, column=0, columnspan=10, pady=10, sticky='n')
 
         cont = tk.Label(self, text='', bg="#222222", fg="#FFFFFF")
-        cont.grid(row=0, column=10, sticky = 'n')
+        cont.grid(row=1, column=0, columnspan=10, sticky='n')
+
         # Create button to play
         self.play_button = tk.Button(self, text="Play", command=self.choose_symbol, bg="#333333", fg="#FFFFFF")
-        self.play_button.grid(row=1, column=5, columnspan=3, pady=10)
+        self.play_button.grid(row=1, column=0, columnspan=10, pady=10)
 
-       # Reset every gaps between rows & columns within the grid in the future
-        self.grid_rowconfigure(1, weight = 0)
-        self.grid_rowconfigure(2, weight = 0)
-        self.grid_rowconfigure(3, weight = 0)
-        self.grid_rowconfigure(4, weight = 0)
-        self.grid_rowconfigure(5, weight = 0)
-        self.grid_rowconfigure(6, weight = 0)
-        self.grid_rowconfigure(7, weight = 0)
-        self.grid_rowconfigure(8, weight = 0)
-        self.grid_rowconfigure(9, weight = 0)
-        
-        self.grid_columnconfigure(1, weight = 0)
-        self.grid_columnconfigure(2, weight = 0)
-        self.grid_columnconfigure(3, weight = 0)
-        self.grid_columnconfigure(4, weight = 0)
-        self.grid_columnconfigure(5, weight = 0)
-        self.grid_columnconfigure(6, weight = 0)
-        self.grid_columnconfigure(7, weight = 0)
-        self.grid_columnconfigure(8, weight = 0)
-        
-        # Configure grid to center the widgets
-        self.grid_rowconfigure(0, weight=2)
-        self.grid_rowconfigure(10, weight=2)
-        self.grid_columnconfigure(0, weight=2)
-        self.grid_columnconfigure(9, weight=2)
+        # Center widgets
+        self.grid_columnconfigure(0, weight=1)
 
     def create_board(self):
         # Create board display
         # Save buttons to list
         self.buttons = []
 
+        # Create a frame for the board
+        board_frame = tk.Frame(self)
+        board_frame.grid(row=2, column=0, columnspan=8, pady=10)
+
         # Create buttons
         for row in range(8):
             button_row = []
             for col in range(8):
-                button = tk.Button(self, text="", width=6, height=2,
-                                   command=lambda r=row, c=col: self.button_click(r, c), bg="#333333", fg="#FFFFFF")
-                button.grid(row=row+2, column=col+1, padx=0, pady=0)
+                button = tk.Button(board_frame, text="", width=6, height=2,
+                                command=lambda r=row, c=col: self.button_click(r, c), bg="#333333", fg="#FFFFFF")
+                button.grid(row=row, column=col)
                 button_row.append(button)
             self.buttons.append(button_row)
+
+    def create_score_board(self):
+        # Create score for player and bot
+        self.score_player = tk.StringVar()
+        self.score_player.set("Player: 0")
+        self.score_bot = tk.StringVar()
+        self.score_bot.set("Bot: 0")
+
+        # Create frame for score board
+        score_frame = tk.Frame(self, bg="#222222")
+        score_frame.grid(row=3, column=0, pady=10)
+
+        # Create a label for the score and set its textvariable
+        self.score_label_player = tk.Label(score_frame, textvariable=self.score_player, bg="#333333", fg="#FFFFFF", padx=5, pady=5)
+        self.score_label_player.grid(row=0, column=0, padx=(5,10))
+
+        self.score_label_bot = tk.Label(score_frame, textvariable=self.score_bot, bg="#333333", fg="#FFFFFF", padx=5, pady=5)
+        self.score_label_bot.grid(row=0, column=1)
 
     def button_click(self, row, col):
         # Get clicked button
@@ -409,5 +412,5 @@ class TicTacToe(tk.Tk):
 
 # Run application
 if __name__ == "__main__":
-    app = TicTacToe()
+    app = XOGame()
     app.mainloop()
