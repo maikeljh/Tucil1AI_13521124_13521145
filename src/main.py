@@ -11,7 +11,7 @@ class XOGame(tk.Tk):
 
         # Set application configuration
         self.title("XOGame")
-        self.geometry("800x600")
+        self.geometry("800x550")
         self.configure(bg="#222222")
         self.resizable(False, False)
 
@@ -21,7 +21,7 @@ class XOGame(tk.Tk):
 
         # Calculate the position for the center of the screen
         window_width = 800
-        window_height = 600
+        window_height = 550
         x = (screen_width - window_width) // 2
         y = (screen_height - window_height) // 2
 
@@ -29,7 +29,7 @@ class XOGame(tk.Tk):
         self.geometry(f"{window_width}x{window_height}+{x}+{y}")
 
         # Initialize attributes
-        self.board = [["" for _ in range(3)] for _ in range(3)]
+        self.board = [["" for _ in range(8)] for _ in range(8)]
         self.player = ""
         self.bot = ""
         self.alpha = float("-inf")
@@ -159,7 +159,6 @@ class XOGame(tk.Tk):
         # Create a label for the score and set its textvariable
         self.score_label_player = tk.Label(score_frame, textvariable=self.score_player, bg="#333333", fg="#FFFFFF", padx=5, pady=5)
         self.score_label_player.grid(row=0, column=0, padx=(5,10))
-
         self.score_label_bot = tk.Label(score_frame, textvariable=self.score_bot, bg="#333333", fg="#FFFFFF", padx=5, pady=5)
         self.score_label_bot.grid(row=0, column=1)
 
@@ -188,47 +187,41 @@ class XOGame(tk.Tk):
                 # Bot moves
                 self.bot_move()
 
-    def assign_winner(self, symbol):
+    def assign_winner(self, winner):
         # Assign winner
-        if symbol == self.player:
-            self.winner = "Player"
-        else:
-            self.winner = "Bot"
+        self.winner = winner
 
     def check_winner(self):
-        # Check for rows
+        # Check if all boards already filled
         for row in self.board:
-            if row[0] == row[1] == row[2] and row[0] != "":
-                # Assign winner
-                self.assign_winner(row[0])
-                return True
+            for col in row:
+                if col == "":
+                    # Game continues
+                    return False
         
-        # Check for cols
-        for col in range(3):
-            if self.board[0][col] == self.board[1][col] == self.board[2][col] and self.board[0][col] != "":
-                # Assign winner
-                self.assign_winner(self.board[0][col])
-                return True
+        # All boards already filled, decide who is the winner
+        # Get number
+        player_score = int(self.score_player.get().split(":")[1].strip())
+        bot_score = int(self.score_bot.get().split(":")[1].strip())
+
+        # Check Draw
+        if player_score == bot_score:
+            return False
+
+        # Check winner
+        if player_score > bot_score:
+            self.assign_winner("Player")
+        elif player_score < bot_score:
+            self.assign_winner("Bot")
         
-        # Check for diagonals
-        if self.board[0][0] == self.board[1][1] == self.board[2][2] and self.board[0][0] != "":
-            # Assign winner
-            self.assign_winner(self.board[1][1])
-            return True
-        elif self.board[0][2] == self.board[1][1] == self.board[2][0] and self.board[0][2] != "":
-            # Assign winner
-            self.assign_winner(self.board[1][1])
-            return True
-        
-        # No winner
-        return False
+        return True
     
     def check_draw(self):
         # Check if game draws or not
         for row in self.board:
             for box in row:
                 if box == "":
-                    # Game still ongoing
+                    # Game continues
                     return False
         
         # No empty box, game draws
@@ -347,50 +340,49 @@ class XOGame(tk.Tk):
         elif self.check_draw():
             messagebox.showinfo("Game Over", "It's a draw!")
             self.reset_game()
-### Algo gw
+
     def adjacent(self, row, col):
+        # Function to replace adjacent enemy symbols
+
         # Checking if adjacent tiles are out of the map
-        def Border_check(row, col):
+        def border_check(row, col):
             if row > 9 | row < 2 | col > 8 | col < 1:
                 return True
             else:
                 return False
-        # Checking 4 adjacent tiles
-        #  Under
-        if Border_check(row-1, col):
+
+        # Checking 4 adjacent tiles (Under, Above, Left, Right)
+        # Under
+        if border_check(row-1, col):
             button = self.button[row-1][col]
             if button["text"] == self.bot:
-                # Replace if tile was owned by the bot with the player
                 button["text"] = self.player
                 self.board[row-1][col] = self.player
                 
         # Above
-        if Border_check(row+1, col):
+        if border_check(row+1, col):
             button = self.button[row+1][col]
             if button["text"] == self.bot:
-                # Replace if tile was owned by the bot with the player
                 button["text"] = self.player
                 self.board[row+1][col] = self.player
         
         # Left
-        if Border_check(row, col-1):
+        if border_check(row, col-1):
             button = self.button[row][col-1]
             if button["text"] == self.bot:
-                # Replace if tile was owned by the bot with the player
                 button["text"] = self.player
                 self.board[row][col-1] = self.player
                 
         # Right
-        if Border_check(row, col+1):
+        if border_check(row, col+1):
             button = self.button[row][col+1]
             if button["text"] == self.bot:
-                # Replace if tile was owned by the bot with the player
                 button["text"] = self.player
                 self.board[row][col+1] = self.player
 
     def reset_game(self):
         # Reset board
-        self.board = [["" for _ in range(3)] for _ in range(3)]
+        self.board = [["" for _ in range(8)] for _ in range(8)]
 
         # Enable play button
         self.play_button.config(state="normal")
