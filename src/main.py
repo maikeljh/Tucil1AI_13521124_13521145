@@ -3,6 +3,9 @@
 import tkinter as tk
 from tkinter import messagebox
 
+# DEFINE MAX DEPTH
+MAX_DEPTH = 1
+
 # Tucil 1 AI Application
 class XOGame(tk.Tk):
     def __init__(self):
@@ -148,14 +151,14 @@ class XOGame(tk.Tk):
         self.buttons = []
 
         # Create a frame for the board
-        board_frame = tk.Frame(self)
-        board_frame.grid(row=2, column=0, columnspan=8, pady=10)
+        self.board_frame = tk.Frame(self)
+        self.board_frame.grid(row=2, column=0, columnspan=8, pady=10)
 
         # Create buttons
         for row in range(8):
             button_row = []
             for col in range(8):
-                button = tk.Button(board_frame, text="", width=6, height=2,
+                button = tk.Button(self.board_frame, text="", width=6, height=2,
                                 command=lambda r=row, c=col: self.button_click(r, c), bg="#333333", fg="#FFFFFF")
                 button.grid(row=row, column=col)
                 button_row.append(button)
@@ -164,19 +167,35 @@ class XOGame(tk.Tk):
     def create_score_board(self):
         # Create score for player and bot
         self.score_player = tk.StringVar()
-        self.score_player.set("Player: 0")
+        self.score_player.set("Player: 4")
         self.score_bot = tk.StringVar()
-        self.score_bot.set("Bot: 0")
+        self.score_bot.set("Bot: 4")
 
         # Create frame for score board
-        score_frame = tk.Frame(self, bg="#222222")
-        score_frame.grid(row=3, column=0, pady=10)
+        self.score_frame = tk.Frame(self, bg="#222222")
+        self.score_frame.grid(row=3, column=0, pady=10)
 
         # Create a label for the score and set its textvariable
-        self.score_label_player = tk.Label(score_frame, textvariable=self.score_player, bg="#333333", fg="#FFFFFF", padx=5, pady=5)
+        self.score_label_player = tk.Label(self.score_frame, textvariable=self.score_player, bg="#333333", fg="#FFFFFF", padx=5, pady=5)
         self.score_label_player.grid(row=0, column=0, padx=(5,10))
-        self.score_label_bot = tk.Label(score_frame, textvariable=self.score_bot, bg="#333333", fg="#FFFFFF", padx=5, pady=5)
+        self.score_label_bot = tk.Label(self.score_frame, textvariable=self.score_bot, bg="#333333", fg="#FFFFFF", padx=5, pady=5)
         self.score_label_bot.grid(row=0, column=1)
+
+    def update_score(self):
+        # Function to update score player and bot
+        score_player = 0
+        score_bot = 0
+
+        for row in self.board:
+            for col in row:
+                if col == self.player:
+                    score_player += 1
+                elif col == self.bot:
+                    score_bot += 1
+
+        # Set new score
+        self.score_player.set("Player: " + str(score_player))
+        self.score_bot.set("Bot: " + str(score_bot))
 
     def button_click(self, row, col):
         # Get clicked button
@@ -189,11 +208,17 @@ class XOGame(tk.Tk):
             self.board[row][col] = self.player
             
             # Assign 4 adjacent tiles
-            self.adjacent(row, col)
+            self.adjacent(row, col, "Player")
+
+            # Update score
+            self.update_score()
 
             # Check if player wins or not
             if self.check_winner():
-                messagebox.showinfo("Game Over", "Player wins!")
+                if self.winner == "Player":
+                    messagebox.showinfo("Game Over", "Player wins!")
+                else:
+                    messagebox.showinfo("Game Over", "Bot wins!")
                 self.reset_game()
             elif self.check_draw():
                 # Check if game draws or not
@@ -245,7 +270,6 @@ class XOGame(tk.Tk):
 
     def minimax(self, depth, bot_turn, alpha, beta):
         # Minimax algorithm
-
         # Evaluate board
         if self.check_winner():
             # If player wins
@@ -259,6 +283,10 @@ class XOGame(tk.Tk):
             # If game draws
             return 0
         
+        # Add a depth limit
+        if depth >= MAX_DEPTH:
+            return 0
+
         # Maximizer
         if bot_turn:
             # Set best to negative infinity
@@ -271,11 +299,26 @@ class XOGame(tk.Tk):
                         # Assign box to bot
                         self.board[i][j] = self.bot
 
+                        # Assign 4 adjacent tiles
+                        changes = self.adjacent(i, j, "Bot")
+
+                        # Update score
+                        self.update_score()
+
                         # Find best value
                         best = max(best, self.minimax(depth + 1, not bot_turn, alpha, beta))
 
                         # Redo bot's move
                         self.board[i][j] = ""
+
+                        # Redo adjacent
+                        if len(changes):
+                            for coor in changes:
+                                self.board[coor[0]][coor[1]] = self.player
+                                self.buttons[coor[0]][coor[1]]["text"] = self.player
+
+                        # Update score
+                        self.update_score()
 
                         # Find Best Alpha
                         alpha = max(alpha, best)
@@ -299,11 +342,26 @@ class XOGame(tk.Tk):
                         # Assign box to player
                         self.board[i][j] = self.player
 
+                        # Assign 4 adjacent tiles
+                        changes = self.adjacent(i, j, "Player")
+
+                        # Update score
+                        self.update_score()
+
                         # Find min value
                         best = min(best, self.minimax(depth + 1, not bot_turn, alpha, beta))
 
                         # Redo player's move
                         self.board[i][j] = ""
+
+                        # Redo adjacent
+                        if len(changes):
+                            for coor in changes:
+                                self.board[coor[0]][coor[1]] = self.bot
+                                self.buttons[coor[0]][coor[1]]["text"] = self.bot
+
+                        # Update score
+                        self.update_score()
 
                         # Find Best Beta
                         beta = min(beta, best)
@@ -329,6 +387,12 @@ class XOGame(tk.Tk):
                     # Assign box to bot
                     self.board[i][j] = self.bot
 
+                    # Assign 4 adjacent tiles
+                    changes = self.adjacent(i, j, "Bot")
+
+                    # Update score
+                    self.update_score()
+
                     # Reset alpha and beta
                     self.alpha = float("-inf")
                     self.beta = float("inf")
@@ -339,6 +403,15 @@ class XOGame(tk.Tk):
                     # Redo bot's move
                     self.board[i][j] = ""
 
+                    # Redo adjacent
+                    if len(changes):
+                        for coor in changes:
+                            self.board[coor[0]][coor[1]] = self.player
+                            self.buttons[coor[0]][coor[1]]["text"] = self.player
+
+                    # Update score
+                    self.update_score()
+
                     # Save best move
                     if move_value > best_value:
                         best_move = (i, j)
@@ -348,53 +421,104 @@ class XOGame(tk.Tk):
         self.board[best_move[0]][best_move[1]] = self.bot
         button = self.buttons[best_move[0]][best_move[1]]
         button["text"] = self.bot
+        
+        # Assign 4 adjacent tiles
+        self.adjacent(i, j, "Bot")
 
+        # Update score
+        self.update_score()
+        
         # Check winner or draw
         if self.check_winner():
-            messagebox.showinfo("Game Over", "Bot wins!")
+            if self.winner == "Player":
+                messagebox.showinfo("Game Over", "Player wins!")
+            else:
+                messagebox.showinfo("Game Over", "Bot wins!")
             self.reset_game()
         elif self.check_draw():
             messagebox.showinfo("Game Over", "It's a draw!")
             self.reset_game()
 
-    def adjacent(self, row, col):
+    def adjacent(self, row, col, role):
         # Function to replace adjacent enemy symbols
-
         # Checking if adjacent tiles are out of the map
         def border_check(row, col):
-            if row > 9 | row < 2 | col > 8 | col < 1:
+            if row >= 0 and row < 8 and col >= 0 and col < 8:
                 return True
             else:
                 return False
 
+        changes = []
+
         # Checking 4 adjacent tiles (Under, Above, Left, Right)
-        # Under
-        if border_check(row-1, col):
-            button = self.button[row-1][col]
-            if button["text"] == self.bot:
-                button["text"] = self.player
-                self.board[row-1][col] = self.player
-                
-        # Above
-        if border_check(row+1, col):
-            button = self.button[row+1][col]
-            if button["text"] == self.bot:
-                button["text"] = self.player
-                self.board[row+1][col] = self.player
-        
-        # Left
-        if border_check(row, col-1):
-            button = self.button[row][col-1]
-            if button["text"] == self.bot:
-                button["text"] = self.player
-                self.board[row][col-1] = self.player
-                
-        # Right
-        if border_check(row, col+1):
-            button = self.button[row][col+1]
-            if button["text"] == self.bot:
-                button["text"] = self.player
-                self.board[row][col+1] = self.player
+        # For Player
+        if role == "Player":
+            # Under
+            if border_check(row-1, col):
+                button = self.buttons[row-1][col]
+                if button["text"] == self.bot:
+                    button["text"] = self.player
+                    self.board[row-1][col] = self.player
+                    changes.append((row-1, col))
+
+            # Above
+            if border_check(row+1, col):
+                button = self.buttons[row+1][col]
+                if button["text"] == self.bot:
+                    button["text"] = self.player
+                    self.board[row+1][col] = self.player
+                    changes.append((row+1, col))
+            
+            # Left
+            if border_check(row, col-1):
+                button = self.buttons[row][col-1]
+                if button["text"] == self.bot:
+                    button["text"] = self.player
+                    self.board[row][col-1] = self.player
+                    changes.append((row, col-1))
+
+            # Right
+            if border_check(row, col+1):
+                button = self.buttons[row][col+1]
+                if button["text"] == self.bot:
+                    button["text"] = self.player
+                    self.board[row][col+1] = self.player
+                    changes.append((row, col+1))
+        else:
+            # For Bot
+            # Under
+            if border_check(row-1, col):
+                button = self.buttons[row-1][col]
+                if button["text"] == self.player:
+                    button["text"] = self.bot
+                    self.board[row-1][col] = self.bot
+                    changes.append((row-1, col))
+                    
+            # Above
+            if border_check(row+1, col):
+                button = self.buttons[row+1][col]
+                if button["text"] == self.player:
+                    button["text"] = self.bot
+                    self.board[row+1][col] = self.bot
+                    changes.append((row+1, col))
+            
+            # Left
+            if border_check(row, col-1):
+                button = self.buttons[row][col-1]
+                if button["text"] == self.player:
+                    button["text"] = self.bot
+                    self.board[row][col-1] = self.bot
+                    changes.append((row, col-1))
+                    
+            # Right
+            if border_check(row, col+1):
+                button = self.buttons[row][col+1]
+                if button["text"] == self.player:
+                    button["text"] = self.bot
+                    self.board[row][col+1] = self.bot
+                    changes.append((row, col+1))
+
+        return changes
 
     def reset_game(self):
         # Reset board
@@ -414,7 +538,12 @@ class XOGame(tk.Tk):
         for button_row in self.buttons:
             for button in button_row:
                 button.destroy()
-        
+
+        # Destory widgets
+        self.board_frame.destroy()
+        self.score_label_player.destroy()
+        self.score_label_bot.destroy()
+
         # Reset buttons
         self.buttons = []
 
