@@ -51,6 +51,19 @@ class XOGame(tk.Tk):
             self.bot = "O"
             # Player plays first
 
+    def initialize_board(self):
+        # Bottom Left Corner
+        for i in range(6, 8):
+            for j in range(0, 2):
+                self.board[i][j] = "X"
+                self.buttons[i][j]["text"] = "X"
+        
+        # Upper Right Corner
+        for i in range(0, 2):
+            for j in range(6, 8):
+                self.board[i][j] = "O"
+                self.buttons[i][j]["text"] = "O"
+
     def choose_symbol(self):
         # Set button disabled when opening popup
         self.play_button.config(state="disabled")
@@ -97,6 +110,9 @@ class XOGame(tk.Tk):
 
             # Set symbol
             self.set_symbol(symbol)
+
+            # Initialize board
+            self.initialize_board()
 
             # Destroy popup
             popup.destroy()
