@@ -4,7 +4,7 @@ import tkinter as tk
 from tkinter import messagebox
 
 # DEFINE MAX DEPTH
-MAX_DEPTH = 1
+MAX_DEPTH = 3
 
 # Tucil 1 AI Application
 class XOGame(tk.Tk):
@@ -295,7 +295,7 @@ class XOGame(tk.Tk):
             # Check every possible moves
             for i, row in enumerate(self.board):
                 for j, box in enumerate(row):
-                    if box == "":
+                    if box == "" and self.check_adjacent(i, j, self.bot):
                         # Assign box to bot
                         self.board[i][j] = self.bot
 
@@ -338,7 +338,7 @@ class XOGame(tk.Tk):
             # Check every possible moves
             for i, row in enumerate(self.board):
                 for j, box in enumerate(row):
-                    if box == "":
+                    if box == "" and self.check_adjacent(i, j, self.player):
                         # Assign box to player
                         self.board[i][j] = self.player
 
@@ -373,6 +373,25 @@ class XOGame(tk.Tk):
             # Return best value
             return best
 
+    def check_adjacent(self, row, col, symbol):
+        # Under
+        if self.border_check(row-1, col) and self.board[row - 1][col] != symbol:
+            return True
+
+        # Above
+        if self.border_check(row+1, col) and self.board[row + 1][col] != symbol:
+            return True
+
+        # Left
+        if self.border_check(row, col-1) and self.board[row][col - 1] != symbol:
+            return True
+
+        # Right
+        if self.border_check(row, col+1) and self.board[row][col + 1] != symbol:
+            return True
+
+        return False
+
     def bot_move(self):
         # Bot's turn
 
@@ -383,7 +402,7 @@ class XOGame(tk.Tk):
         # Find best move for bot
         for i, row in enumerate(self.board):
             for j, box in enumerate(row):
-                if box == "":
+                if box == "" and self.check_adjacent(i, j, self.bot):
                     # Assign box to bot
                     self.board[i][j] = self.bot
 
@@ -423,7 +442,7 @@ class XOGame(tk.Tk):
         button["text"] = self.bot
         
         # Assign 4 adjacent tiles
-        self.adjacent(i, j, "Bot")
+        self.adjacent(best_move[0], best_move[1], "Bot")
 
         # Update score
         self.update_score()
@@ -439,22 +458,22 @@ class XOGame(tk.Tk):
             messagebox.showinfo("Game Over", "It's a draw!")
             self.reset_game()
 
+    def border_check(self, row, col):
+        if row >= 0 and row < 8 and col >= 0 and col < 8:
+            return True
+        else:
+            return False
+
     def adjacent(self, row, col, role):
         # Function to replace adjacent enemy symbols
         # Checking if adjacent tiles are out of the map
-        def border_check(row, col):
-            if row >= 0 and row < 8 and col >= 0 and col < 8:
-                return True
-            else:
-                return False
-
         changes = []
 
         # Checking 4 adjacent tiles (Under, Above, Left, Right)
         # For Player
         if role == "Player":
             # Under
-            if border_check(row-1, col):
+            if self.border_check(row-1, col):
                 button = self.buttons[row-1][col]
                 if button["text"] == self.bot:
                     button["text"] = self.player
@@ -462,7 +481,7 @@ class XOGame(tk.Tk):
                     changes.append((row-1, col))
 
             # Above
-            if border_check(row+1, col):
+            if self.border_check(row+1, col):
                 button = self.buttons[row+1][col]
                 if button["text"] == self.bot:
                     button["text"] = self.player
@@ -470,7 +489,7 @@ class XOGame(tk.Tk):
                     changes.append((row+1, col))
             
             # Left
-            if border_check(row, col-1):
+            if self.border_check(row, col-1):
                 button = self.buttons[row][col-1]
                 if button["text"] == self.bot:
                     button["text"] = self.player
@@ -478,7 +497,7 @@ class XOGame(tk.Tk):
                     changes.append((row, col-1))
 
             # Right
-            if border_check(row, col+1):
+            if self.border_check(row, col+1):
                 button = self.buttons[row][col+1]
                 if button["text"] == self.bot:
                     button["text"] = self.player
@@ -487,7 +506,7 @@ class XOGame(tk.Tk):
         else:
             # For Bot
             # Under
-            if border_check(row-1, col):
+            if self.border_check(row-1, col):
                 button = self.buttons[row-1][col]
                 if button["text"] == self.player:
                     button["text"] = self.bot
@@ -495,7 +514,7 @@ class XOGame(tk.Tk):
                     changes.append((row-1, col))
                     
             # Above
-            if border_check(row+1, col):
+            if self.border_check(row+1, col):
                 button = self.buttons[row+1][col]
                 if button["text"] == self.player:
                     button["text"] = self.bot
@@ -503,7 +522,7 @@ class XOGame(tk.Tk):
                     changes.append((row+1, col))
             
             # Left
-            if border_check(row, col-1):
+            if self.border_check(row, col-1):
                 button = self.buttons[row][col-1]
                 if button["text"] == self.player:
                     button["text"] = self.bot
@@ -511,7 +530,7 @@ class XOGame(tk.Tk):
                     changes.append((row, col-1))
                     
             # Right
-            if border_check(row, col+1):
+            if self.border_check(row, col+1):
                 button = self.buttons[row][col+1]
                 if button["text"] == self.player:
                     button["text"] = self.bot
