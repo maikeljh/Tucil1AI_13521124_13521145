@@ -3,9 +3,6 @@
 import tkinter as tk
 from tkinter import messagebox
 
-# DEFINE MAX DEPTH
-MAX_DEPTH = 3
-
 # Tucil 1 AI Application
 class XOGame(tk.Tk):
     def __init__(self):
@@ -268,24 +265,25 @@ class XOGame(tk.Tk):
         # No empty box, game draws
         return True
 
+    def objective_function(self):
+        # Function to evaluate board state
+        score_player = 0
+        score_bot = 0
+
+        for row in self.board:
+            for col in row:
+                if col == self.player:
+                    score_player += 1
+                elif col == self.bot:
+                    score_bot += 1
+        
+        return score_bot - score_player
+
     def minimax(self, depth, bot_turn, alpha, beta):
         # Minimax algorithm
         # Evaluate board
-        if self.check_winner():
-            # If player wins
-            if self.winner == "Player":
-                return -10
-            else:
-                # If bot wins
-                return 10
-        
-        if self.check_draw():
-            # If game draws
-            return 0
-        
-        # Add a depth limit
-        if depth >= MAX_DEPTH:
-            return 0
+        if self.check_winner() or self.check_draw:
+            return self.objective_function()
 
         # Maximizer
         if bot_turn:
@@ -324,7 +322,7 @@ class XOGame(tk.Tk):
                         alpha = max(alpha, best)
 
                         # Beta cutoff
-                        if alpha > beta:
+                        if alpha >= beta:
                             return best
 
             # Return best value
@@ -367,7 +365,7 @@ class XOGame(tk.Tk):
                         beta = min(beta, best)
 
                         # Alpha cutoff
-                        if alpha > beta:
+                        if alpha >= beta:
                             return best
             
             # Return best value
