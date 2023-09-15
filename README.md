@@ -2,7 +2,7 @@
 Program ini dibuat dengan tujuan untuk memeriksa feasibility dari algoritma yang telah dirancang pada laporan.
 
 # Screenshot
-![Screenshot_3660](https://github.com/maikeljh/Tucil1AI_13521124_13521145/assets/87570374/f6010bbe-b93c-420a-8d22-466cc94fcd9a)
+![Screenshot_3660](https://github.com/maikeljh/Tucil1AI_13521124_13521145/assets/87570374/ffdd4949-73a9-4798-bc0f-2ed0a9e2eaf0)
 
 # How to Run
 1. Go to src inside project directory ("cd src")
