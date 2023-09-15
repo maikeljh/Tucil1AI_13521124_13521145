@@ -293,7 +293,7 @@ class XOGame(tk.Tk):
             # Check every possible moves
             for i, row in enumerate(self.board):
                 for j, box in enumerate(row):
-                    if box == "" and self.check_adjacent(i, j, self.bot):
+                    if box == "":
                         # Assign box to bot
                         self.board[i][j] = self.bot
 
@@ -336,7 +336,7 @@ class XOGame(tk.Tk):
             # Check every possible moves
             for i, row in enumerate(self.board):
                 for j, box in enumerate(row):
-                    if box == "" and self.check_adjacent(i, j, self.player):
+                    if box == "":
                         # Assign box to player
                         self.board[i][j] = self.player
 
@@ -400,7 +400,7 @@ class XOGame(tk.Tk):
         # Find best move for bot
         for i, row in enumerate(self.board):
             for j, box in enumerate(row):
-                if box == "" and self.check_adjacent(i, j, self.bot):
+                if box == "":
                     # Assign box to bot
                     self.board[i][j] = self.bot
 
